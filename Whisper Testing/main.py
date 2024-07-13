@@ -1,10 +1,14 @@
 import os
 import whisper
 from shutil import which
+from prettify_txt import prettify_txt
+
+# print(whisper.available_models())
 
 # Define the path to the ffmpeg executable
 ffmpeg_path = r"C:\Users\hamza\Downloads\ffmpeg-7.0.1-essentials_build\ffmpeg-7.0.1-essentials_build\bin\ffmpeg.exe"  # Adjust the path to where you extracted ffmpeg
-
+# ffmpeg_path = r"C:\Users\hamza\OneDrive - University of Manitoba\Documents\HISHAM\Computer Science\Transcription Project\Whisper Testing\ffmpeg-7.0.1.tar.xz"  # Adjust the path to where you extracted ffmpeg
+# C:\Users\hamza\Downloads\ffmpeg-7.0.1-essentials_build\ffmpeg-7.0.1-essentials_build\bin\ffmpeg.exe
 # Check if ffmpeg is available
 if not which("ffmpeg"):
     if os.path.isfile(ffmpeg_path):
@@ -14,13 +18,14 @@ if not which("ffmpeg"):
         exit(1)
 
 # Load the Whisper model with GPU support
-model = whisper.load_model("medium")
+model = whisper.load_model("large")
 
 # Transcribe the audio file with language specified and word timestamps
-result = model.transcribe("test.mp3", fp16=False, language="ur", word_timestamps=True)
+result = model.transcribe(r"C:\Users\hamza\OneDrive - University of Manitoba\Documents\HISHAM\Computer Science\Transcription Project\Whisper Testing\test.mp3", fp16=False, language="ur", word_timestamps=True)
 
+output_file_name = 'transcription-large.txt'
 # Write the transcription to a text file with utf-8 encoding
-with open("transcription.txt", "w", encoding="utf-8") as f:
+with open(output_file_name, "w", encoding="utf-8") as f:
     f.write(result["text"])
     # for segment in result["segments"]:
     #     start = segment["start"]
@@ -28,7 +33,6 @@ with open("transcription.txt", "w", encoding="utf-8") as f:
     #     text = segment["text"]
     #     f.write(f"[{start:.2f} - {end:.2f}] {text}\n")
 
-
-from openai import OpenAI
-
+# Prettify the transcription text file
+prettify_txt(output_file_name)
 

@@ -64,6 +64,7 @@ for key, value in src_tgt_list:
     sub_end_time = time.time()
     print(f"\nExecution time for this model: {sub_end_time - sub_start_time:.2f} seconds")
     print('----------------------------------------------------------')
+    
 
 
 # # Load model and tokenizer

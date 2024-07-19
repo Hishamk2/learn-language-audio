@@ -1,7 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QHBoxLayout, QSizePolicy, QShortcut
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import Qt, QUrl, QTime
+from PyQt5.QtGui import QKeySequence
 
 class AudioPlayer(QMainWindow):
     def __init__(self):
@@ -50,8 +51,12 @@ class AudioPlayer(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)
 
+        # Add shortcut for playing and pausing audio
+        self.play_pause_shortcut = QShortcut(QKeySequence("Space"), self)
+        self.play_pause_shortcut.activated.connect(self.toggle_pause)
+
     def play_audio(self):
-        audio_url = QUrl.fromLocalFile("/home/student/kidwaih1/Documents/CS/learn-language-audio/data/audio/tsd-audio.mp3")  # Change the path to your audio file
+        audio_url = QUrl.fromLocalFile("/home/student/kidwaih1/Documents/CS/learn-language-audio/data/audio/tsd-audio.mp3")  # Use the specified path to your audio file
         self.player.setMedia(QMediaContent(audio_url))
         self.player.play()
 

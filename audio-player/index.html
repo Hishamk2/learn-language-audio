@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player</title>
+</head>
+<body>
+    <div class="audio-file">
+        <audio id="audio" src="../data/audio/tsd-audio.mp3" controls></audio>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio');
+        console.log(audio); 
+        console.log(audio.currentTime);
+        console.log(audio.duration);
+    </script>
+</body>
+</html>

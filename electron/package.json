@@ -1,15 +1,11 @@
 {
-  "name": "electron",
+  "name": "electron-text-display",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "electron ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "electron": "^31.3.0"
+    "electron": "^13.1.7"
   }
 }

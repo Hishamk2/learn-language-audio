@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Electron App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text File Display</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Hello from Electron!</h1>
+    <h1>Transcribed and Translated Texts</h1>
+    <div id="transcribed-container" class="text-container">
+        <h2>Transcribed Text</h2>
+        <pre id="transcribed-text"></pre>
+    </div>
+    <div id="translated-container" class="text-container">
+        <h2>Translated Text</h2>
+        <pre id="translated-text"></pre>
+    </div>
+    <script src="renderer.js"></script>
 </body>
 </html>

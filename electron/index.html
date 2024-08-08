@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player</title>
+</head>
+<body>
+    <div class="audio-file">
+        <audio id="audio" controls></audio>
+        <button id="uploadButton">Upload Audio File</button>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const uploadButton = document.getElementById('uploadButton');
+
+        uploadButton.addEventListener('click', async () => {
+            const filePath = await window.electron.openFileDialog();
+            if (filePath) {
+                audio.src = filePath;
+                audio.play();
+            }
+        });
+
+        console.log(audio); 
+        console.log(audio.currentTime);
+        console.log(audio.duration);
+    </script>
+</body>
+</html>

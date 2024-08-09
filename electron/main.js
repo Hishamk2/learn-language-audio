@@ -14,6 +14,15 @@ function createWindow() {
     });
 
     mainWindow.loadFile('index.html');
+
+    mainWindow.webContents.on('did-finish-load', () => {
+        dialog.showOpenDialog({
+            defaultPath:app.getPath('music'),
+            buttonLabel: 'Select',
+            
+        })
+    });
+    
 }
 
 app.whenReady().then(createWindow);
@@ -30,10 +39,12 @@ app.on('activate', () => {
     }
 });
 
-ipcMain.handle('dialog:openFile', async () => {
-    const result = await dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
-    });
-    return result.filePaths[0];
-});
+
+
+// ipcMain.handle('dialog:openFile', async () => {
+//     const result = await dialog.showOpenDialog({
+//         properties: ['openFile'],
+//         filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
+//     });
+//     return result.filePaths[0];
+// });

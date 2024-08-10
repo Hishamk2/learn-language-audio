@@ -11,21 +11,6 @@
         <button id="uploadButton">Upload Audio File</button>
     </div>
 
-    <script>
-        const audio = document.getElementById('audio');
-        const uploadButton = document.getElementById('uploadButton');
-
-        uploadButton.addEventListener('click', async () => {
-            const filePath = await window.electron.openFileDialog();
-            if (filePath) {
-                audio.src = filePath;
-                audio.play();
-            }
-        });
-
-        console.log(audio); 
-        console.log(audio.currentTime);
-        console.log(audio.duration);
-    </script>
+    <script src="renderer.js"></script>
 </body>
 </html>

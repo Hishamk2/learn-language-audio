@@ -1,5 +1,31 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
+
+// Define the menu items
+const menuItems = [
+    {
+        label: 'File',
+        submenu: [
+            {
+                label: 'Open',
+                click: async () => {
+                    const mainWindow = BrowserWindow.getFocusedWindow(); // Get the currently focused window
+                    const result = await dialog.showOpenDialog(mainWindow, {
+                        properties: ['openFile'],
+                        filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
+                    });
+                    if (result.filePaths.length > 0) {
+                        mainWindow.webContents.send('file-selected', result.filePaths[0]);
+                    }
+                }
+            }
+        ]
+        
+    }
+];
+
+const menu = Menu.buildFromTemplate(menuItems);
+Menu.setApplicationMenu(menu);
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -15,13 +41,13 @@ function createWindow() {
 
     mainWindow.loadFile('index.html');
 
-    mainWindow.webContents.on('did-finish-load', () => {
-        dialog.showOpenDialog({
-            defaultPath:app.getPath('music'),
-            buttonLabel: 'Select',
+    // mainWindow.webContents.on('did-finish-load', () => {
+    //     dialog.showOpenDialog({
+    //         defaultPath:app.getPath('music'),
+    //         buttonLabel: 'Select',
             
-        })
-    });
+    //     })
+    // });
     
 }
 

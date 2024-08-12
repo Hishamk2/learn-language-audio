@@ -1,5 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
+const fs = require('fs');
+
+// Hardcoded paths to the .srt files
+const transcribedFilePath = '/home/hisham-kidwai/Documents/HISHAM/Computer Science/learn-language-audio/Whisper Testing/test-whisper/med/ur/test.srt';
+const translatedFilePath = '/home/hisham-kidwai/Documents/HISHAM/Computer Science/learn-language-audio/Whisper Testing/test-whisper/med/en/test.srt';
 
 // Define the menu items
 const menuItems = [
@@ -33,7 +38,17 @@ function createWindow() {
         }
     });
 
-    mainWindow.loadFile('index.html');    
+    mainWindow.loadFile('index.html'); 
+    
+    const transcribedContent = fs.readFileSync(transcribedFilePath, 'utf-8');
+    const translatedContent = fs.readFileSync(translatedFilePath, 'utf-8');
+
+    mainWindow.webContents.on('did-finish-load', () => {
+        mainWindow.webContents.send('srt-files-loaded', {
+            transcribed: transcribedContent,
+            translated: translatedContent
+        });
+    });
 }
 
 app.whenReady().then(createWindow);

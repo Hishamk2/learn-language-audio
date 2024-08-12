@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Player</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="audio-file">
         <audio id="audio" controls></audio>
     </div>
 
-    <h2>Transcribed Content:</h2>
-    <div id="transcribed"></div>
+    <button id="toggleButton">Switch to Line-by-Line View</button>
 
-    <h2>Translated Content:</h2>
-    <div id="translated"></div>
+    <div id="content" class="side-by-side">
+        <div id="transcribed" class="transcribed"></div>
+        <div id="translated" class="translated"></div>
+    </div>
 
     <script src="renderer.js"></script>
 </body>

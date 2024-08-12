@@ -7,16 +7,10 @@ const menuItems = [
         label: 'File',
         submenu: [
             {
-                label: 'Open',
-                click: async () => {
-                    const mainWindow = BrowserWindow.getFocusedWindow(); // Get the currently focused window
-                    const result = await dialog.showOpenDialog(mainWindow, {
-                        properties: ['openFile'],
-                        filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
-                    });
-                    if (result.filePaths.length > 0) {
-                        mainWindow.webContents.send('file-selected', result.filePaths[0]);
-                    }
+                label: 'Open File',
+                accelerator: 'CmdOrCtrl+O',
+                click() {
+                    openFile();
                 }
             }
         ]
@@ -39,16 +33,7 @@ function createWindow() {
         }
     });
 
-    mainWindow.loadFile('index.html');
-
-    // mainWindow.webContents.on('did-finish-load', () => {
-    //     dialog.showOpenDialog({
-    //         defaultPath:app.getPath('music'),
-    //         buttonLabel: 'Select',
-            
-    //     })
-    // });
-    
+    mainWindow.loadFile('index.html');    
 }
 
 app.whenReady().then(createWindow);
@@ -66,11 +51,17 @@ app.on('activate', () => {
 });
 
 
-
-// ipcMain.handle('dialog:openFile', async () => {
-//     const result = await dialog.showOpenDialog({
-//         properties: ['openFile'],
-//         filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
-//     });
-//     return result.filePaths[0];
-// });
+function openFile() {
+    const mainWindow = BrowserWindow.getFocusedWindow();    
+    dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+        filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }]
+    }).then(result => {
+        if (!result.canceled && result.filePaths.length > 0) {
+            const filePath = result.filePaths[0];
+            mainWindow.webContents.send('file-opened', filePath);
+        }
+    }).catch(err => {
+        console.error('Error opening file:', err);
+    });
+}

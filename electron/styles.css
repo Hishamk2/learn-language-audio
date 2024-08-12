@@ -1,0 +1,20 @@
+.side-by-side {
+    display: flex;
+    justify-content: space-between;
+}
+
+.line-by-line {
+    display: block;
+}
+
+.transcribed, .translated {
+    width: 48%;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+#toggleButton {
+    margin: 20px;
+    padding: 10px;
+    cursor: pointer;
+}

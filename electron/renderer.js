@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const audio = document.getElementById('audio');
     const toggleButton = document.getElementById('toggleButton');
     const contentDiv = document.getElementById('content');
+    const transcribedDiv = document.getElementById('transcribed');
+    const translatedDiv = document.getElementById('translated');
 
     let isSideBySide = true;
     let transcribedLines = [];
@@ -12,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.play();
     });
 
-    // Listen for the srt-files-loaded event
     window.electron.receive('srt-files-loaded', (data) => {
         transcribedLines = data.transcribed.split('\n').filter(line => line.trim() !== '');
         translatedLines = data.translated.split('\n').filter(line => line.trim() !== '');
@@ -27,51 +28,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateView() {
         if (isSideBySide) {
-            // Side-by-side view
+            // Clear and setup side-by-side view
             contentDiv.className = 'side-by-side';
-            contentDiv.innerHTML = '';
-
-            const maxLines = Math.max(transcribedLines.length, translatedLines.length);
-            for (let i = 0; i < maxLines; i++) {
-                const transcribedLine = transcribedLines[i] || '';
-                const translatedLine = translatedLines[i] || '';
-
-                const lineContainer = document.createElement('div');
-                lineContainer.classList.add('line-container');
-
-                const transcribedDiv = document.createElement('div');
-                transcribedDiv.classList.add('transcribed');
-                transcribedDiv.textContent = transcribedLine;
-
-                const translatedDiv = document.createElement('div');
-                translatedDiv.classList.add('translated');
-                translatedDiv.textContent = translatedLine;
-
-                lineContainer.appendChild(transcribedDiv);
-                lineContainer.appendChild(translatedDiv);
-                contentDiv.appendChild(lineContainer);
-            }
+            transcribedDiv.innerHTML = transcribedLines.map(line => `<div>${line}</div>`).join('');
+            translatedDiv.innerHTML = translatedLines.map(line => `<div>${line}</div>`).join('');
         } else {
-            // Alternating line-by-line view
+            // Clear and setup line-by-line view
             contentDiv.className = 'line-by-line';
             contentDiv.innerHTML = '';
 
             const maxLines = Math.max(transcribedLines.length, translatedLines.length);
+            let combinedHTML = '';
             for (let i = 0; i < maxLines; i++) {
                 const transcribedLine = transcribedLines[i] || '';
                 const translatedLine = translatedLines[i] || '';
-
-                const transcribedDiv = document.createElement('div');
-                transcribedDiv.classList.add('transcribed');
-                transcribedDiv.textContent = transcribedLine;
-
-                const translatedDiv = document.createElement('div');
-                translatedDiv.classList.add('translated');
-                translatedDiv.textContent = translatedLine;
-
-                contentDiv.appendChild(transcribedDiv);
-                contentDiv.appendChild(translatedDiv);
+                combinedHTML += `<div>${transcribedLine}</div><div>${translatedLine}</div>`;
             }
+            contentDiv.innerHTML = combinedHTML;
         }
     }
 });

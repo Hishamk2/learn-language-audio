@@ -2,8 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const audio = document.getElementById('audio');
     const toggleButton = document.getElementById('toggleButton');
     const contentDiv = document.getElementById('content');
-    const transcribedDiv = document.getElementById('transcribed');
-    const translatedDiv = document.getElementById('translated');
 
     let isSideBySide = true;
     let transcribedLines = [];
@@ -31,22 +29,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isSideBySide) {
             // Side-by-side view
             contentDiv.className = 'side-by-side';
-            transcribedDiv.innerHTML = transcribedLines.join('<br>');
-            translatedDiv.innerHTML = translatedLines.join('<br>');
+            contentDiv.innerHTML = '';
+
+            const maxLines = Math.max(transcribedLines.length, translatedLines.length);
+            for (let i = 0; i < maxLines; i++) {
+                const transcribedLine = transcribedLines[i] || '';
+                const translatedLine = translatedLines[i] || '';
+
+                const lineContainer = document.createElement('div');
+                lineContainer.classList.add('line-container');
+
+                const transcribedDiv = document.createElement('div');
+                transcribedDiv.classList.add('transcribed');
+                transcribedDiv.textContent = transcribedLine;
+
+                const translatedDiv = document.createElement('div');
+                translatedDiv.classList.add('translated');
+                translatedDiv.textContent = translatedLine;
+
+                lineContainer.appendChild(transcribedDiv);
+                lineContainer.appendChild(translatedDiv);
+                contentDiv.appendChild(lineContainer);
+            }
         } else {
             // Alternating line-by-line view
             contentDiv.className = 'line-by-line';
-            let combinedLines = [];
+            contentDiv.innerHTML = '';
 
-            // Ensure lines alternate correctly
             const maxLines = Math.max(transcribedLines.length, translatedLines.length);
             for (let i = 0; i < maxLines; i++) {
-                const transcribedLine = transcribedLines[i] || ''; // Handle cases where one array is longer
-                const translatedLine = translatedLines[i] || '';   // Handle cases where one array is longer
-                combinedLines.push(`<div>${transcribedLine}</div><div>${translatedLine}</div>`);
+                const transcribedLine = transcribedLines[i] || '';
+                const translatedLine = translatedLines[i] || '';
+
+                const transcribedDiv = document.createElement('div');
+                transcribedDiv.classList.add('transcribed');
+                transcribedDiv.textContent = transcribedLine;
+
+                const translatedDiv = document.createElement('div');
+                translatedDiv.classList.add('translated');
+                translatedDiv.textContent = translatedLine;
+
+                contentDiv.appendChild(transcribedDiv);
+                contentDiv.appendChild(translatedDiv);
             }
-            transcribedDiv.innerHTML = combinedLines.join('');
-            translatedDiv.innerHTML = ''; // Empty because translation is inline with transcription
         }
     }
 });

@@ -1,32 +1,48 @@
+:root {
+    --gap-size: 20px;
+}
+
 .side-by-side {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px; /* This provides a small space between the two columns */
-    align-items: start;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .transcribed, .translated {
-    padding: 0;
-    margin: 0;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+    word-wrap: break-word; /* Ensures long words wrap */
 }
 
 .transcribed {
     text-align: right;
-    direction: rtl; /* Ensures right-to-left text flows correctly */
+    direction: rtl; /* Right-to-left text */
+    white-space: nowrap; /* Prevents text from wrapping to the next line */
 }
 
 .translated {
     text-align: left;
+    white-space: nowrap; /* Prevents text from wrapping to the next line */
+}
+
+.line-by-line .transcribed,
+.line-by-line .translated {
+    display: block;
 }
 
 .line-by-line {
     display: block;
+    line-height: 1;
 }
 
-#toggleButton {
-    margin: 20px;
-    padding: 10px;
-    cursor: pointer;
+.line-by-line p:nth-child(2n) {
+    margin-bottom: 15px;
+}
+
+p {
+    margin: 5px 0;
+    font-size: 1.2rem;
+    line-height: 1.5;
 }

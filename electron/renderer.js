@@ -1,13 +1,18 @@
+// renderer.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const audio = document.getElementById('audio');
     const toggleButton = document.getElementById('toggleButton');
     const contentDiv = document.getElementById('content');
     const transcribedDiv = document.getElementById('transcribed');
     const translatedDiv = document.getElementById('translated');
+    const zoomInButton = document.getElementById('zoomIn');
+    const zoomOutButton = document.getElementById('zoomOut');
 
     let isSideBySide = true;
     let transcribedLines = [];
     let translatedLines = [];
+    let zoomLevel = 1;
 
     window.electron.receive('file-opened', (filePath) => {
         audio.src = filePath;
@@ -25,6 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
         updateView();
         toggleButton.textContent = isSideBySide ? 'Switch to Line-by-Line View' : 'Switch to Side-by-Side View';
     });
+
+    zoomInButton.addEventListener('click', () => {
+        zoomLevel += 0.1;
+        updateZoom();
+    });
+
+    zoomOutButton.addEventListener('click', () => {
+        zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+        updateZoom();
+    });
+
+    function updateZoom() {
+        contentDiv.style.transform = `scale(${zoomLevel})`;
+        contentDiv.style.transformOrigin = '0 0';
+    }
 
     function updateView() {
         if (isSideBySide) {
@@ -46,5 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             contentDiv.innerHTML = combinedHTML;
         }
+
+        updateZoom();  // Apply the zoom level to the new content
     }
 });

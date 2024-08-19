@@ -46,3 +46,11 @@ p {
     font-size: 1.2rem;
     line-height: 1.5;
 }
+
+/* styles.css */
+
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+}
+

@@ -1,5 +1,3 @@
-// renderer.js
-
 document.addEventListener('DOMContentLoaded', () => {
     const audio = document.getElementById('audio');
     const toggleButton = document.getElementById('toggleButton');
@@ -14,19 +12,74 @@ document.addEventListener('DOMContentLoaded', () => {
     let translatedLines = [];
     let zoomLevel = 1;
 
+    let transcribedEntries = [];
+    let translatedEntries = [];
+
     window.electron.receive('file-opened', (filePath) => {
         audio.src = filePath;
         audio.play();
     });
 
     window.electron.receive('txt-files-loaded', (data) => {
-        console.log(data);
         transcribedLines = data.transcribed.split('\n').filter(line => line.trim() !== '');
         translatedLines = data.translated.split('\n').filter(line => line.trim() !== '');
+
+        transcribedEntries = parseSRT(data.transcribedSRT);
+        translatedEntries = parseSRT(data.translatedSRT);
+
+        console.log('Transcribed Entries:', transcribedEntries);
+        console.log('Translated Entries:', translatedEntries);
+
         updateView();
     });
 
+    function parseSRT(srtContent) {
+        const pattern = /(\d+)\s+(\d{2}):(\d{2}):(\d{2}),(\d{3}) --> (\d{2}):(\d{2}):(\d{2}),(\d{3})\s+([\s\S]+?)(?=\n{2,}|\n*$)/g;
+        const entries = [];
+        let match;
 
+        while ((match = pattern.exec(srtContent)) !== null) {
+            const startTime = parseInt(match[2]) * 3600 + parseInt(match[3]) * 60 + parseInt(match[4]) + parseInt(match[5]) / 1000;
+            const endTime = parseInt(match[6]) * 3600 + parseInt(match[7]) * 60 + parseInt(match[8]) + parseInt(match[9]) / 1000;
+            const text = match[10].replace(/\n/g, ' ');
+            entries.push({ startTime, endTime, text });
+        }
+
+        return entries;
+    }
+    
+    audio.addEventListener('timeupdate', () => {
+        const currentTime = audio.currentTime;
+        console.log(`Current Audio Time: ${currentTime}`);
+        highlightCurrentSentence(currentTime);
+    });
+
+    function highlightCurrentSentence(currentTime) {
+        const transcribedIndex = transcribedEntries.findIndex(entry => currentTime >= entry.startTime && currentTime <= entry.endTime);
+        const translatedIndex = translatedEntries.findIndex(entry => currentTime >= entry.startTime && currentTime <= entry.endTime);
+    
+        console.log(`Transcribed Index: ${transcribedIndex}, Translated Index: ${translatedIndex}`);
+    
+        if (isSideBySide) {
+            if (transcribedIndex !== -1) {
+                transcribedDiv.innerHTML = transcribedEntries.map((entry, i) => `<p class="${i === transcribedIndex ? 'highlight' : ''}">${entry.text}</p>`).join('');
+            }
+    
+            if (translatedIndex !== -1) {
+                translatedDiv.innerHTML = translatedEntries.map((entry, i) => `<p class="${i === translatedIndex ? 'highlight' : ''}">${entry.text}</p>`).join('');
+            }
+        } else {
+            if (transcribedIndex !== -1 && translatedIndex !== -1) {
+                const combinedHTML = transcribedEntries.map((entry, i) => {
+                    const transcribedLine = transcribedEntries[i] ? `<p class="${i === transcribedIndex ? 'highlight' : ''}">${transcribedEntries[i].text}</p>` : '';
+                    const translatedLine = translatedEntries[i] ? `<p class="${i === translatedIndex ? 'highlight' : ''}">${translatedEntries[i].text}</p>` : '';
+                    return `${transcribedLine}${translatedLine}`;
+                }).join('');
+                contentDiv.innerHTML = combinedHTML;
+            }
+        }
+    }
+    
 
     toggleButton.addEventListener('click', () => {
         isSideBySide = !isSideBySide;
@@ -57,29 +110,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set up side-by-side view
             contentDiv.className = 'side-by-side';
     
-            // Create and append transcribedDiv
-            const transcribedDiv = document.createElement('div');
-            transcribedDiv.id = 'transcribed';
-            transcribedDiv.className = 'transcribed';
-            transcribedDiv.innerHTML = transcribedLines.map(line => `<p>${line}</p>`).join('');
+            transcribedDiv.innerHTML = transcribedEntries.map(entry => `<p>${entry.text}</p>`).join('');
+            translatedDiv.innerHTML = translatedEntries.map(entry => `<p>${entry.text}</p>`).join('');
+    
             contentDiv.appendChild(transcribedDiv);
-    
-            // Create and append translatedDiv
-            const translatedDiv = document.createElement('div');
-            translatedDiv.id = 'translated';
-            translatedDiv.className = 'translated';
-            translatedDiv.innerHTML = translatedLines.map(line => `<p>${line}</p>`).join('');
             contentDiv.appendChild(translatedDiv);
-    
         } else {
             // Set up line-by-line view
             contentDiv.className = 'line-by-line';
     
-            const maxLines = Math.max(transcribedLines.length, translatedLines.length);
+            const maxLines = Math.max(transcribedEntries.length, translatedEntries.length);
             let combinedHTML = '';
             for (let i = 0; i < maxLines; i++) {
-                const transcribedLine = transcribedLines[i] || '';
-                const translatedLine = translatedLines[i] || '';
+                const transcribedLine = transcribedEntries[i] ? transcribedEntries[i].text : '';
+                const translatedLine = translatedEntries[i] ? translatedEntries[i].text : '';
                 combinedHTML += `<p>${transcribedLine}</p><p>${translatedLine}</p>`;
             }
             contentDiv.innerHTML = combinedHTML;

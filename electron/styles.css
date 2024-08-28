@@ -68,4 +68,17 @@ p {
     color: #333;
 }
 
+#saveWordButton {
+    margin-top: 10px;
+    display: block;
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
 
+#saveWordButton:hover {
+    background-color: #45a049;
+}

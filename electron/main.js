@@ -90,3 +90,37 @@ function openFile() {
         console.error('Error opening file:', err);
     });
 }
+const axios = require('axios');
+
+// Function to detect the language of the word
+function detectLanguage(word) {
+    const urduRegex = /[\u0600-\u06FF]/;  // Unicode range for Urdu characters
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F]/;  // Unicode range for Arabic characters (includes Urdu)
+    
+    if (urduRegex.test(word)) {
+        return 'ur';  // Urdu
+    } else if (arabicRegex.test(word)) {
+        return 'ar';  // Arabic (if needed)
+    } else {
+        return 'en';  // Default to English
+    }
+}
+
+ipcMain.on('lookup-definition', async (event, word) => {
+    const language = detectLanguage(word);  // Detect the language
+    const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`;  // Use the correct endpoint
+
+    console.log(`Looking up word: ${word} in language: ${language}`);
+
+    try {
+        const response = await axios.get(apiUrl);
+        const definition = response.data[0].meanings[0].definitions[0].definition;
+
+        event.reply('show-definition', definition);
+    } catch (error) {
+        console.error('Error fetching the definition:', error);
+        event.reply('show-definition', 'Definition not found.');
+    }
+});
+
+

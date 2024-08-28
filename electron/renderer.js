@@ -1,9 +1,27 @@
 // renderer.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.electronAPI.lookupDefinition('test');  // Replace 'test' with an English word
+    // window.electronAPI.lookupDefinition('test');  // Replace 'test' with an English word
 
-    
+    let savedWords = [];
+
+    // Tab switching
+    const tabAudio = document.getElementById('tabAudio');
+    const tabSavedWords = document.getElementById('tabSavedWords');
+    const audioPlayerTab = document.getElementById('audioPlayerTab');
+    const savedWordsTab = document.getElementById('savedWordsTab');
+
+    tabAudio.addEventListener('click', () => {
+        audioPlayerTab.style.display = 'block';
+        savedWordsTab.style.display = 'none';
+    });
+
+    tabSavedWords.addEventListener('click', () => {
+        audioPlayerTab.style.display = 'none';
+        savedWordsTab.style.display = 'block';
+        updateSavedWordsList();
+    });
+
     document.addEventListener('dblclick', function () {
         let selectedText = window.getSelection().toString().trim();
         if (selectedText) {
@@ -11,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const range = selection.getRangeAt(0);
             const rect = range.getBoundingClientRect();
             const popup = document.getElementById('definitionPopup');
+            const saveWordButton = document.getElementById('saveWordButton');
 
             // Position the popup just above the selected text
             popup.style.left = `${rect.left + window.scrollX}px`;
@@ -18,21 +37,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Send the selected word to the main process to look up the definition
             window.electronAPI.lookupDefinition(selectedText);
+
+            // Save the word on button click
+            saveWordButton.onclick = () => {
+                savedWords.push(selectedText);
+                alert(`"${selectedText}" saved!`);
+            };
         }
     });
 
     window.electronAPI.receive('show-definition', (definition) => {
         const popup = document.getElementById('definitionPopup');
+        const saveWordButton = document.getElementById('saveWordButton');
+    
         popup.innerText = definition;
+    
+        // Ensure the "Save Word" button is in the popup if not already there
+        if (!popup.contains(saveWordButton)) {
+            popup.appendChild(saveWordButton);
+        }
+    
         popup.style.display = 'block';
     });
     
+
     document.addEventListener('click', () => {
         const popup = document.getElementById('definitionPopup');
         popup.style.display = 'none';
     });
-    
-    
+
+    function updateSavedWordsList() {
+        const savedWordsList = document.getElementById('savedWordsList');
+        savedWordsList.innerHTML = '';
+        savedWords.forEach(word => {
+            const li = document.createElement('li');
+            li.textContent = word;
+            savedWordsList.appendChild(li);
+        });
+    }
+
+
     
     const audio = document.getElementById('audio');
     const toggleButton = document.getElementById('toggleButton');

@@ -1,20 +1,35 @@
+// renderer.js
+
 document.addEventListener('DOMContentLoaded', () => {
     window.electronAPI.lookupDefinition('test');  // Replace 'test' with an English word
 
     
     document.addEventListener('dblclick', function () {
         let selectedText = window.getSelection().toString().trim();
-        console.log("Selected Text:", selectedText);  // Log the selected text
         if (selectedText) {
+            const selection = window.getSelection();
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            const popup = document.getElementById('definitionPopup');
+
+            // Position the popup just above the selected text
+            popup.style.left = `${rect.left + window.scrollX}px`;
+            popup.style.top = `${rect.top + window.scrollY - popup.offsetHeight}px`;
+
             // Send the selected word to the main process to look up the definition
             window.electronAPI.lookupDefinition(selectedText);
         }
     });
-    
 
     window.electronAPI.receive('show-definition', (definition) => {
-        // Display the definition in a modal or a dedicated section
-        document.getElementById('definitionDisplay').innerText = definition;
+        const popup = document.getElementById('definitionPopup');
+        popup.innerText = definition;
+        popup.style.display = 'block';
+    });
+    
+    document.addEventListener('click', () => {
+        const popup = document.getElementById('definitionPopup');
+        popup.style.display = 'none';
     });
     
     

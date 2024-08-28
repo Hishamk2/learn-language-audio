@@ -1,4 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
+    window.electronAPI.lookupDefinition('test');  // Replace 'test' with an English word
+
+    
+    document.addEventListener('dblclick', function () {
+        let selectedText = window.getSelection().toString().trim();
+        console.log("Selected Text:", selectedText);  // Log the selected text
+        if (selectedText) {
+            // Send the selected word to the main process to look up the definition
+            window.electronAPI.lookupDefinition(selectedText);
+        }
+    });
+    
+
+    window.electronAPI.receive('show-definition', (definition) => {
+        // Display the definition in a modal or a dedicated section
+        document.getElementById('definitionDisplay').innerText = definition;
+    });
+    
+    
+    
     const audio = document.getElementById('audio');
     const toggleButton = document.getElementById('toggleButton');
     const contentDiv = document.getElementById('content');
@@ -15,12 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let transcribedEntries = [];
     let translatedEntries = [];
 
-    window.electron.receive('file-opened', (filePath) => {
+    window.electronAPI.receive('file-opened', (filePath) => {
         audio.src = filePath;
         audio.play();
     });
 
-    window.electron.receive('txt-files-loaded', (data) => {
+    window.electronAPI.receive('txt-files-loaded', (data) => {
         transcribedLines = data.transcribed.split('\n').filter(line => line.trim() !== '');
         translatedLines = data.translated.split('\n').filter(line => line.trim() !== '');
 

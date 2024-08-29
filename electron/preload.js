@@ -5,10 +5,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     lookupDefinition: (word) => {
         ipcRenderer.send('lookup-definition', word);
     },
-
-    // Function to receive messages from the main process
+    saveWord: (word) => {
+        ipcRenderer.send('save-word', word);
+    },
     receive: (channel, func) => {
-        let validChannels = ['file-opened', 'txt-files-loaded', 'show-definition'];
+        let validChannels = ['file-opened', 'txt-files-loaded', 'show-definition', 'load-saved-words'];
         if (validChannels.includes(channel)) {
             ipcRenderer.on(channel, (event, ...args) => func(...args));
         }

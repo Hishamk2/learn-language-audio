@@ -4,6 +4,35 @@ const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+const savedWordsFilePath = path.join(app.getPath('userData'), 'savedWords.json');
+// console.log('Saved words file path:', savedWordsFilePath);
+
+function loadSavedWords() {
+    try {
+        if (fs.existsSync(savedWordsFilePath)) {
+            const savedWordsData = fs.readFileSync(savedWordsFilePath);
+            return JSON.parse(savedWordsData);
+        }
+    } catch (error) {
+        console.error('Error loading saved words:', error);
+    }
+    return [];
+}
+
+// Function to save words to file
+function saveWord(word) {
+    let savedWords = loadSavedWords();
+    if (!savedWords.includes(word)) {
+        savedWords.push(word);
+        fs.writeFileSync(savedWordsFilePath, JSON.stringify(savedWords));
+    }
+}
+
+ipcMain.on('save-word', (event, word) => {
+    saveWord(word);
+});
+
+
 // Hardcoded paths to the .srt files
 const transcribedFilePath = '/home/hisham-kidwai/Documents/HISHAM/Computer Science/learn-language-audio/Whisper Testing/test-whisper/med/ur/test.txt';
 const translatedFilePath = '/home/hisham-kidwai/Documents/HISHAM/Computer Science/learn-language-audio/Whisper Testing/test-whisper/med/en/test.txt';
@@ -55,6 +84,10 @@ function createWindow() {
             transcribedSRT: transcribedSRTContent,
             translatedSRT: translatedSRTContent
         });
+
+        // Send the saved words to the renderer process when the application starts
+        const savedWords = loadSavedWords();
+        mainWindow.webContents.send('load-saved-words', savedWords);
     });
 
     // mainWindow.webContents.openDevTools();

@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let savedWords = [];
 
+    // Load saved words from file when the application starts
+    window.electronAPI.receive('load-saved-words', (words) => {
+        savedWords = words || [];
+        updateSavedWordsList();
+    });
+
     // Tab switching
     const tabAudio = document.getElementById('tabAudio');
     const tabSavedWords = document.getElementById('tabSavedWords');
@@ -41,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Save the word on button click
             saveWordButton.onclick = () => {
                 savedWords.push(selectedText);
+                window.electronAPI.saveWord(selectedText);  // Save word to file
                 alert(`"${selectedText}" saved!`);
             };
         }
